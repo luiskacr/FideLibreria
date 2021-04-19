@@ -51,6 +51,31 @@ public class Notificaciones extends JOptionPane {
     }
 
     /**
+     * 
+     * Mensaje de pregunta Si o NO
+     * 
+     * @param mensaje Es el mensaje de la caja
+     * @param titulo Es el titulo de la caja
+     * @return True si lo acepta o False si lo rechaza o cancela
+     */
+    public boolean SioNo(String mensaje, String titulo) {
+        graficos.Mensajes();
+        String[] botones = {"Si", "No"};
+        try {
+            int input = showOptionDialog(null, mensaje, titulo, JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, botones, botones[0]);
+            //0=si, 1=no, 2=cancelar
+            if (input == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
      * Metodo para preguntar un numero que solo acepta numero enteros como
      * respuesta
      *
@@ -71,7 +96,12 @@ public class Notificaciones extends JOptionPane {
         }
 
     }
-
+    
+    /**
+     * Metodo que muestra una caja de notificacion de un mensaje
+     * 
+     * @param mensaje String con mensaje a mostrar en la caja
+     */
     public void notificar(String mensaje) {
         graficos.Mensajes();
         showMessageDialog(null, mensaje);

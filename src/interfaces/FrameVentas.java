@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import logica.ClienteBD;
 import logica.Cliente;
+import logica.CrearFactura;
 import logica.DetalleVentas;
 import logica.LibroBD;
 import logica.Libro;
@@ -35,6 +36,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
     Ventas v = new Ventas();
     VentasDB ventasDB = new VentasDB();
     DetalleVentas Dv = new DetalleVentas();
+    CrearFactura facturaPdf = new CrearFactura();
 
     double precioLibro;
     int cantidad;
@@ -54,7 +56,6 @@ public class FrameVentas extends javax.swing.JInternalFrame {
 
     public void generaSerieFactura() {
         String serie = ventasDB.idVentas();
-        System.out.println(serie);
         if (serie == null || serie.equalsIgnoreCase("")) {
             jTFactura.setText("0000001");
         } else {
@@ -143,6 +144,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
         jTFactura.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jTFactura.setForeground(new java.awt.Color(255, 255, 255));
         jTFactura.setEnabled(false);
+        jTFactura.setSelectionColor(new java.awt.Color(255, 255, 255));
 
         jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(255, 255, 255));
@@ -151,6 +153,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
         jTVendedor.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jTVendedor.setForeground(new java.awt.Color(255, 255, 255));
         jTVendedor.setEnabled(false);
+        jTVendedor.setSelectionColor(new java.awt.Color(255, 255, 255));
         jTVendedor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTVendedorActionPerformed(evt);
@@ -551,7 +554,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jBAgregarActionPerformed
 
     private void jBCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelarActionPerformed
-        limpiartabla(); 
+        limpiartabla();
         limpiarCampos();
     }//GEN-LAST:event_jBCancelarActionPerformed
 
@@ -560,17 +563,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jTVendedorActionPerformed
 
     private void jBVenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBVenderActionPerformed
-
-        if (jTTotal.getText().equals("")) {
-            mensaje.error("Debe de Ingresar Productos para Vender");
-        } else {
-            guardarVentas();
-            guardarDetalle();
-            actualizaStock();
-            mensaje.notificar("Se ha Generado la Venta");
-            limpiarCampos();
-        }
-
+        vender();
     }//GEN-LAST:event_jBVenderActionPerformed
 
     private void jBBuscarClieActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBBuscarClieActionPerformed
@@ -580,6 +573,26 @@ public class FrameVentas extends javax.swing.JInternalFrame {
     private void jBBuscarProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBBuscarProdActionPerformed
         buscarProducto();
     }//GEN-LAST:event_jBBuscarProdActionPerformed
+    
+
+    public void vender() {
+        if (jTTotal.getText().equals("")) {
+            mensaje.error("Debe de Ingresar Productos para Vender");
+        } else {
+            guardarVentas();
+            guardarDetalle();
+            actualizaStock();
+            mensaje.notificar("Se ha Generado la Venta");
+            boolean factura  = mensaje.SioNo("Desea Imprimir la Factura?", "Factura en Pdf");
+            if(factura){
+                generarFactura();
+                
+            }
+            limpiarCampos();
+        }
+
+    }
+    
     public void actualizaStock() {
         for (int i = 0; i < jTVentas.getRowCount(); i++) {
             Libro libro = new Libro();
@@ -612,7 +625,6 @@ public class FrameVentas extends javax.swing.JInternalFrame {
         } else {
             IdVenta = Integer.parseInt(ventasDB.idVentas());
         }
-        System.out.println("Detalle idVenta" + IdVenta);
 
         for (int i = 0; i < jTVentas.getRowCount(); i++) {
             int idProducto = Integer.parseInt(jTVentas.getValueAt(i, 1).toString());
@@ -627,6 +639,37 @@ public class FrameVentas extends javax.swing.JInternalFrame {
             ventasDB.GuardarDetalleVentas(Dv);
         }
 
+    }
+    
+    private void generarFactura(){
+
+        ArrayList lista = new ArrayList();
+        
+        for (int i = 0; i < jTVentas.getRowCount(); i++) {
+           String id= jTVentas.getValueAt(i, 0).toString();
+           String codigo= jTVentas.getValueAt(i, 1).toString();
+           String producto= jTVentas.getValueAt(i, 2).toString();
+           String cantidad= jTVentas.getValueAt(i, 3).toString();
+           String precio= jTVentas.getValueAt(i, 4).toString();
+           String total= jTVentas.getValueAt(i, 5).toString();
+           
+            lista.add(id);
+            lista.add(codigo);
+            lista.add(producto);
+            lista.add(cantidad);
+            lista.add(precio);
+            lista.add(total);
+       
+        }
+        
+        String numfac = jTFactura.getText();
+        String Cliente = jTCliente.getText();
+        String correo = cliente.getCorreoCliente();
+        String Vendedor = jTVendedor.getText();
+        String subTotal = jTSubTotal.getText();
+        String total = jTTotal.getText();
+        
+        facturaPdf.CrearPDF(lista,numfac,Cliente,correo,Vendedor,subTotal,total);
     }
 
     public void agregar() {
@@ -699,7 +742,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
             } else {
                 respuesta = mensaje.confirmar("Cliente no Registrado, Desea Registrarlo?", "Error no se encuentra Cliente");
                 if (respuesta) {
-                    FrameClientes cf = new FrameClientes();
+                    FrameClientes cf = new FrameClientes(this.vendedor);
                     Principal.VentanaPrincipal.add(cf);
                     cf.setVisible(true);
                 }
@@ -719,7 +762,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
         } else {
             libro = libroDB.listarID(Integer.parseInt(idProducto));
 
-            if (String.valueOf(libro.getIdLibro()).equalsIgnoreCase(idProducto)) {//incluir validacion de buscar el codigo o nombre del libro 
+            if (String.valueOf(libro.getIdLibro()).equalsIgnoreCase(idProducto)) {
                 jTCodProducto.setText(String.valueOf(libro.getIdLibro()));
                 jTProducto.setText(libro.getNombreLibro());
                 jTPrecio.setText(String.valueOf(libro.getPrecio()));

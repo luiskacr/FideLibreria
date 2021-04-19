@@ -49,12 +49,6 @@ public class Login extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setText("USUARIO");
 
-        jTextUsuario.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextUsuarioActionPerformed(evt);
-            }
-        });
-
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setText("PASSWORD");
 
@@ -133,27 +127,22 @@ public class Login extends javax.swing.JFrame {
         validar();
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jTextUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextUsuarioActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextUsuarioActionPerformed
-
     //Metodo que valida con la Base de Datos el Usuario y Contraseña
     public void validar() {
         String usuario = jTextUsuario.getText();
         String Contraseña = String.valueOf(jPassword1.getPassword());
         if (jTextUsuario.getText().equals("") || String.valueOf(jPassword1.getPassword()).equals("")) {
-            JOptionPane.showMessageDialog(this, "No ha indicado Usuario o Contraseña", "Error", 0);
+            mensaje.error("No ha indicado Usuario o Contraseña");
             jTextUsuario.requestFocus();
         } else {
             vendedor = vendedorBD.validarVendedor(usuario, Contraseña);
             if (vendedor.getUserVendedor() != null && vendedor.getPassVendedor() != null && vendedor.isEstado() == true) {
-                nombreVendedor=vendedor.getApellidoVendedor()+ " "+vendedor.getApellidoVendedor();
                 Principal Principal = new Principal(vendedor);
                 Principal.setVisible(true);
                 dispose();
                 
             } else {
-                JOptionPane.showMessageDialog(this, "Debe de ingresar usuarios validos", "Error", 0);
+                mensaje.error("Debe de ingresar usuarios validos");
             }
         }
     }

@@ -6,10 +6,15 @@
 package interfaces;
 
 import java.awt.Color;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import logica.Cliente;
 import logica.ClienteBD;
+import logica.Vendedor;
 
 /**
  *
@@ -25,6 +30,7 @@ public class FrameClientes extends javax.swing.JInternalFrame {
     ClienteBD CDatos = new ClienteBD();
     Cliente cliente = new Cliente();
     Notificaciones mensaje = new Notificaciones();
+    Vendedor vendedor = new Vendedor();
 
     DefaultTableModel modelo = new DefaultTableModel();
     Personalizar personalizar = new Personalizar();
@@ -33,12 +39,16 @@ public class FrameClientes extends javax.swing.JInternalFrame {
     /**
      * Creates new form FrameClientes
      */
-    public FrameClientes() {
+    public FrameClientes(Vendedor vendedor) {
         initComponents();
+        this.vendedor = vendedor;
+        if (vendedor.isPermisos() == false) {
+            jBEliminar.setEnabled(false);
+        }
         listar();
     }
 
-    public void listar() {
+    private void listar() {
         List<Cliente> lista = CDatos.listar();
         modelo = (DefaultTableModel) jTableCliente.getModel();
         Object[] tabla = new Object[7];
@@ -408,18 +418,14 @@ public class FrameClientes extends javax.swing.JInternalFrame {
         } else {
             buscar(cedulaConsulta);
         }
-
     }//GEN-LAST:event_jBBuscarActionPerformed
 
     private void jBActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBActualizarActionPerformed
-
         actualizar();
     }//GEN-LAST:event_jBActualizarActionPerformed
 
     private void jBEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEliminarActionPerformed
-
         eliminar();
-
     }//GEN-LAST:event_jBEliminarActionPerformed
 
     private void jTableClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableClienteMouseClicked
@@ -446,13 +452,19 @@ public class FrameClientes extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jTableClienteMouseClicked
 
     private void jBAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBAgregarActionPerformed
-        agregar();
+        try {
+            agregar();
+        } catch (IOException ex) {
+            //Logger.getLogger(FrameClientes.class.getName()).log(Level.SEVERE, null, ex);
+            mensaje.error("Error al incluir Cliente");
+        }
     }//GEN-LAST:event_jBAgregarActionPerformed
 
-    public void agregar() {
-        try {
-            if (validaCamposVacios() == true) {
-                if (validarCedula(jTCedula.getText()) && validaCorreo(jTCorreo.getText())) {
+    private void agregar() throws IOException {
+
+        if (validaCamposVacios()) {
+            if (validarCedula(jTCedula.getText()) && validaCorreo(jTCorreo.getText())) {
+                if (CDatos.existeCliente(Integer.parseInt(jTCedula.getText()))) {
                     String cedula = jTCedula.getText();
                     String nombre = jTNombre.getText();
                     String apellido = jTApellido.getText();
@@ -470,34 +482,42 @@ public class FrameClientes extends javax.swing.JInternalFrame {
 
                     CDatos.incluir(agregar);
 
+                    boolean pass = mensaje.confirmar("Desea que se le envie la Contraseña por Correo ", "Confirmacion de Correo");
+                    if (pass) {
+                        String mensaje = cedula + "," + nombre + "," + apellido + "," + correo + "," + usuario;
+                        enviarCorreo(mensaje);
+                    }
                     limpiarTabla();
                     listar();
                     limpiarCapos();
                 } else {
-                    mensaje.error("Los Datos de Correo o Cedula no cumplen los equisitos");
-
+                    mensaje.error("El Cliente ya existe");
+                    buscar(Integer.parseInt(jTCedula.getText()));
                 }
             } else {
-                mensaje.error("Los campos se encuentran Vacios");
+                mensaje.error("Los Datos de Correo o Cedula no cumplen los requisitos");
             }
-
-        } catch (Exception e) {
-            mensaje.error("Error al incluir los Datos");
-
+        } else {
+            mensaje.error("Los campos se encuentran Vacios");
         }
 
     }
 
-    public void buscar(int cedBuscar) {
+    private void buscar(int cedBuscar) {
         cliente = CDatos.buscarCliente(cedBuscar);
         System.out.println(cliente.getId());
         if (cliente.getId() <= 0) {
             mensaje.error("El cliente " + cedBuscar + " no existe, Favor Crearlo");
         } else {
-            
-            jTableCliente.setRowSelectionInterval(cliente.getId() - 1, cliente.getId() - 1); //Se elecciona la columana que coincide con el ID 
+            int fila = 0;
+            for (int i = 0; i < jTableCliente.getRowCount(); i++) {
+                if (Integer.parseInt(jTableCliente.getValueAt(i, 0).toString()) == cliente.getId()) {
+                    fila = i;
+                }
 
-            int fila = jTableCliente.getSelectedRow();
+            }
+
+            jTableCliente.setRowSelectionInterval(fila, fila);
 
             this.id = Integer.parseInt(jTableCliente.getValueAt(fila, 0).toString());
             String cedula = jTableCliente.getValueAt(fila, 1).toString();
@@ -517,31 +537,36 @@ public class FrameClientes extends javax.swing.JInternalFrame {
         }
     }
 
-    public void actualizar() {
+    private void actualizar() {
         int fila = jTableCliente.getSelectedRow();
         if (fila == -1) {
             mensaje.error("No ha Seleccionado una Fila");
         } else if (validarCedula(jTCedula.getText()) && validaCorreo(jTCorreo.getText())) {
-            String cedula = jTCedula.getText();
-            String nombre = jTNombre.getText();
-            String apellido = jTApellido.getText();
-            String correo = jTCorreo.getText();
-            String usuario = jTUsuario.getText();
-            String direccion = jTDireccion.getText();
+            if (CDatos.existeCliente(Integer.parseInt(jTCedula.getText()))) {
+                String cedula = jTCedula.getText();
+                String nombre = jTNombre.getText();
+                String apellido = jTApellido.getText();
+                String correo = jTCorreo.getText();
+                String usuario = jTUsuario.getText();
+                String direccion = jTDireccion.getText();
 
-            Object[] objActualizar = new Object[7];
-            objActualizar[0] = cedula;
-            objActualizar[1] = nombre;
-            objActualizar[2] = apellido;
-            objActualizar[3] = correo;
-            objActualizar[4] = usuario;
-            objActualizar[5] = direccion;
-            objActualizar[6] = id;
+                Object[] objActualizar = new Object[7];
+                objActualizar[0] = cedula;
+                objActualizar[1] = nombre;
+                objActualizar[2] = apellido;
+                objActualizar[3] = correo;
+                objActualizar[4] = usuario;
+                objActualizar[5] = direccion;
+                objActualizar[6] = id;
 
-            CDatos.actualizar(objActualizar);
-            limpiarTabla();
-            listar();
-            limpiarCapos();
+                int a = CDatos.actualizar(objActualizar);
+                limpiarTabla();
+                listar();
+                limpiarCapos();
+            } else {
+               mensaje.error("La Cedula del cliente ya existe en el sistema"); 
+                buscar(Integer.parseInt(jTCedula.getText()));
+            }
 
         } else {
             mensaje.error("Los Datos de Correo o Cedula no cumplen los equisitos para Actualizarse");
@@ -549,7 +574,7 @@ public class FrameClientes extends javax.swing.JInternalFrame {
 
     }
 
-    public void eliminar() {
+    private void eliminar() {
         int fila = jTableCliente.getSelectedRow();
         String nombre = jTNombre.getText();
         if (fila == -1) {
@@ -569,7 +594,26 @@ public class FrameClientes extends javax.swing.JInternalFrame {
         }
     }
 
-    public boolean validarCedula(String ced) {
+    private void enviarCorreo(String datos) {
+        final String ip = "127.0.0.1";
+        final int puerto = 9000;
+        DataInputStream in;
+        DataOutputStream out;
+        try {
+            Socket sc = new Socket(ip, puerto);
+            in = new DataInputStream(sc.getInputStream());
+            out = new DataOutputStream(sc.getOutputStream());
+
+            out.writeUTF(datos);
+            sc.close();
+        } catch (Exception e) {
+            mensaje.error("ERROR al conectar al Servidor");
+
+        }
+
+    }
+
+    private boolean validarCedula(String ced) {
         boolean validar = false;
         try {
             int tamaño = ced.length();
@@ -584,7 +628,7 @@ public class FrameClientes extends javax.swing.JInternalFrame {
         return validar;
     }
 
-    public boolean validaCorreo(String correo) {
+    private boolean validaCorreo(String correo) {
         boolean validar = false;
         if (correo.contains("@") && (correo.endsWith(".com")) || (correo.endsWith(".es"))) {
             validar = true;
@@ -592,7 +636,7 @@ public class FrameClientes extends javax.swing.JInternalFrame {
         return validar;
     }
 
-    public boolean validaCamposVacios() {
+    private boolean validaCamposVacios() {
 
         if (jTCedula.getText().length() == 0 && (cliente.getId() <= 0)) {
             return false;
@@ -608,16 +652,16 @@ public class FrameClientes extends javax.swing.JInternalFrame {
 
     }
 
-    public void limpiarCapos() {
-        jTCedula.setText(" ");
-        jTNombre.setText(" ");
-        jTApellido.setText(" ");
-        jTCorreo.setText(" ");
-        jTUsuario.setText(" ");
-        jTDireccion.setText(" ");
+    private void limpiarCapos() {
+        jTCedula.setText("");
+        jTNombre.setText("");
+        jTApellido.setText("");
+        jTCorreo.setText("");
+        jTUsuario.setText("");
+        jTDireccion.setText("");
     }
 
-    public void limpiarTabla() {
+    private void limpiarTabla() {
         for (int i = 0; i < modelo.getRowCount(); i++) {
             modelo.removeRow(i);
             i--;

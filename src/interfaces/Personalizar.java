@@ -14,7 +14,8 @@ import javax.swing.ImageIcon;
 public class Personalizar {
 
     UIManager UI = new UIManager();
-
+    
+    //Colores Base de la interface
     Color fondoBg = new Color(43, 43, 43); //Gris Oscuro
     Color fondoPanel = new Color(69, 73, 74); //Gris Medio
     Color Texto = new Color(102, 102, 102); //Gris Claro
@@ -53,16 +54,25 @@ public class Personalizar {
         UI.put("Spinner.background", Texto);
         UI.put("Spinner.font", new Font("Segoe Ul", Font.BOLD, 14));
         UI.put("Spinner.foreground", Color.white);
-        //Barra
+        //Barras
 
         UI.put("ScrollBar.background", fondoPanel);
         UI.put("ScrollPane.background", fondoPanel);
         UI.put("ScrollBar.thumb", fondoPanel);
         UI.put("scrollbar", fondoPanel);
-
-
+        UI.put("scrollbar", fondoPanel);
+        
+        
+        //Radio Button 
+        UI.put("RadioButton.background", fondoPanel);
+        UI.put("RadioButton.font", new Font("Segoe Ul", Font.BOLD, 14));
+        UI.put("RadioButton.foreground", Color.white);
     }
+    
 
+    /**
+     * 
+     */
     public void Mensajes() {
         //Propiedades de color, letra para el Joption Pane
         UI.put("OptionPane.background", fondoPanel);
@@ -100,8 +110,8 @@ public class Personalizar {
     }
 
 
-    public void table(int datos) {
-
+    public void tableLineas(int datos) {
+        
     }
 
 

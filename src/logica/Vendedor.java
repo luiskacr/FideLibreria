@@ -11,6 +11,7 @@ public class Vendedor {
     String NombreVendedor;
     String ApellidoVendedor;
     boolean estado;
+    boolean permisos;
     String userVendedor;
     String passVendedor;
 
@@ -25,17 +26,27 @@ public class Vendedor {
      * @param NombreVendedor El nombre del Vendedor
      * @param ApellidoVendedor El apellido del Vendedor
      * @param estado El estado si el vendedor se encuentra activos o Inactivo
+     * @param permisos El estado del vendedor si tiene permisos de usuario
      * @param userVendedor El usuario del Vendedor
      * @param passVendedor La Contraseña del usuario
      */
-    public Vendedor(int idVendedor, int cedVendedor, String NombreVendedor, String ApellidoVendedor, boolean estado, String userVendedor, String passVendedor) {
+    public Vendedor(int idVendedor, int cedVendedor, String NombreVendedor, String ApellidoVendedor, boolean estado,boolean permisos ,String userVendedor, String passVendedor) {
         this.idVendedor = idVendedor;
         this.cedVendedor = cedVendedor;
         this.NombreVendedor = NombreVendedor;
         this.ApellidoVendedor = ApellidoVendedor;
         this.estado = estado;
+        this.permisos = permisos;
         this.userVendedor = userVendedor;
         this.passVendedor = passVendedor;
+    }
+
+    public boolean isPermisos() {
+        return permisos;
+    }
+
+    public void setPermisos(boolean permisos) {
+        this.permisos = permisos;
     }
 
     public int getIdVendedor() {

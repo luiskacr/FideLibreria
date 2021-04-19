@@ -11,7 +11,7 @@ import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import logica.AutorBD;
 import logica.Autores;
-
+import logica.Vendedor;
 
 /**
  *
@@ -23,17 +23,25 @@ public class FrameAutores extends javax.swing.JInternalFrame {
     Color fondoBg = new Color(43, 43, 43); //Gris Oscuro
     Color fondoPanel = new Color(69, 73, 74); //Gris Medio
     Color Texto = new Color(102, 102, 102); //Gris Claro
-    
+
     DefaultTableModel modelo = new DefaultTableModel();
+    Notificaciones mensajes = new Notificaciones();
     AutorBD autorBD = new AutorBD();
-    
-    public FrameAutores() {
+    Vendedor vendedor = new Vendedor();
+
+    int id;
+
+    public FrameAutores(Vendedor vendedor) {
         initComponents();
-        listar();
+        this.vendedor = vendedor;
+        if (vendedor.isPermisos() == false) {
+            jBEliminar.setEnabled(false);
+        }
+        listarTabla();
         llenarCombox();
     }
-    
-     public void listar() {
+
+    public void listarTabla() {
         List<Autores> lista = autorBD.listar();
         modelo = (DefaultTableModel) jTAutores.getModel();
         Object[] tabla = new Object[4];
@@ -42,20 +50,34 @@ public class FrameAutores extends javax.swing.JInternalFrame {
             tabla[1] = lista.get(i).getNombreAutor();
             tabla[2] = lista.get(i).getApellidoAutor();
             tabla[3] = lista.get(i).getPais();
-            
- 
+
             modelo.addRow(tabla);
         }
         jTAutores.setModel(modelo);
     }
-     
-     public void llenarCombox() {
-        jCBAutores.removeAllItems();
-        List<String> listapais= new ArrayList<>();
+
+    public void llenarCombox() {
+        jCBPais.removeAllItems();
+        List<String> listapais = new ArrayList<>();
         listapais = autorBD.listaPaices();
         for (int i = 0; i < listapais.size(); i++) {
-            jCBAutores.addItem(listapais.get(i));
+            jCBPais.addItem(listapais.get(i));
         }
+    }
+
+    public void limpiarTabla() {
+        for (int i = 0; i < modelo.getRowCount(); i++) {
+            modelo.removeRow(i);
+            i--;
+        }
+    }
+
+    public void limpiarCampos() {
+
+        jTNombre.setText("");
+        jTApellido.setText("");
+        autorBD.idPais("");
+        jCBPais.setSelectedIndex(0);
     }
 
     /**
@@ -73,12 +95,11 @@ public class FrameAutores extends javax.swing.JInternalFrame {
         jLabel5 = new javax.swing.JLabel();
         jBLimpiar = new javax.swing.JButton();
         jBAgregar = new javax.swing.JButton();
-        jBBuscar = new javax.swing.JButton();
         jBActualizar = new javax.swing.JButton();
         jBEliminar = new javax.swing.JButton();
         jTNombre = new javax.swing.JTextField();
         jTApellido = new javax.swing.JTextField();
-        jCBAutores = new javax.swing.JComboBox<>();
+        jCBPais = new javax.swing.JComboBox<>();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTAutores = new javax.swing.JTable();
@@ -125,18 +146,6 @@ public class FrameAutores extends javax.swing.JInternalFrame {
             }
         });
 
-        jBBuscar.setBackground(fondoPanel);
-        jBBuscar.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jBBuscar.setForeground(new java.awt.Color(255, 255, 255));
-        jBBuscar.setText("Buscar");
-        jBBuscar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jBBuscar.setFocusPainted(false);
-        jBBuscar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBBuscarActionPerformed(evt);
-            }
-        });
-
         jBActualizar.setBackground(fondoPanel);
         jBActualizar.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jBActualizar.setForeground(new java.awt.Color(255, 255, 255));
@@ -161,9 +170,9 @@ public class FrameAutores extends javax.swing.JInternalFrame {
             }
         });
 
-        jCBAutores.setBackground(Texto);
-        jCBAutores.setForeground(new java.awt.Color(255, 255, 255));
-        jCBAutores.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jCBPais.setBackground(Texto);
+        jCBPais.setForeground(new java.awt.Color(255, 255, 255));
+        jCBPais.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -176,9 +185,7 @@ public class FrameAutores extends javax.swing.JInternalFrame {
                         .addComponent(jBLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jBAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jBBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addGap(186, 186, 186)
                         .addComponent(jBActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jBEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -189,7 +196,7 @@ public class FrameAutores extends javax.swing.JInternalFrame {
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jTNombre, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
-                            .addComponent(jCBAutores, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jCBPais, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -208,10 +215,9 @@ public class FrameAutores extends javax.swing.JInternalFrame {
                 .addGap(26, 26, 26)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jCBAutores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jCBPais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(50, 50, 50)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -251,6 +257,11 @@ public class FrameAutores extends javax.swing.JInternalFrame {
         jTAutores.setRowHeight(30);
         jTAutores.setShowGrid(true);
         jTAutores.getTableHeader().setReorderingAllowed(false);
+        jTAutores.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTAutoresMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTAutores);
         if (jTAutores.getColumnModel().getColumnCount() > 0) {
             jTAutores.getColumnModel().getColumn(0).setResizable(false);
@@ -302,33 +313,136 @@ public class FrameAutores extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpiarActionPerformed
-
+        limpiarTabla();
+        limpiarCampos();
+        listarTabla();
     }//GEN-LAST:event_jBLimpiarActionPerformed
 
     private void jBAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBAgregarActionPerformed
-
+        incluir();
     }//GEN-LAST:event_jBAgregarActionPerformed
 
-    private void jBBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBBuscarActionPerformed
-
-    }//GEN-LAST:event_jBBuscarActionPerformed
-
     private void jBActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBActualizarActionPerformed
-
+        actualizar();
     }//GEN-LAST:event_jBActualizarActionPerformed
 
     private void jBEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEliminarActionPerformed
-
+        eliminar();
     }//GEN-LAST:event_jBEliminarActionPerformed
+
+    private void jTAutoresMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTAutoresMouseClicked
+        int fila = jTAutores.getSelectedRow();
+        if (fila == -1) {
+            mensajes.error("Debe de Seleccionar una Fila");
+        } else {
+            this.id = Integer.parseInt(jTAutores.getValueAt(fila, 0).toString());
+            String nombre = jTAutores.getValueAt(fila, 1).toString();
+            String apellido = jTAutores.getValueAt(fila, 2).toString();
+            String pais = jTAutores.getValueAt(fila, 3).toString();
+
+            jTNombre.setText(nombre);
+            jTApellido.setText(apellido);
+            int index = autorBD.idPais(pais);
+            jCBPais.setSelectedIndex(index);
+        }
+    }//GEN-LAST:event_jTAutoresMouseClicked
+
+    private void incluir() {
+
+        if (validaCamposVacios()) {
+
+            String nombre = jTNombre.getText();
+            String apellido = jTApellido.getText();
+            String pais = jCBPais.getSelectedItem().toString();
+            Object[] objIncluir = new Object[3];
+            objIncluir[0] = nombre;
+            objIncluir[1] = apellido;
+            objIncluir[2] = pais;
+
+            autorBD.incluir(objIncluir);
+            limpiarTabla();
+            limpiarCampos();
+            listarTabla();
+        } else {
+            mensajes.error("No cumple los requistos algun campo esta en vacio");
+        }
+
+    }
+
+    private void actualizar() {
+        int fila = jTAutores.getSelectedRow();
+        if (fila == -1) {
+            mensajes.error("Debe de Seleccionar una Fila");
+
+        } else {
+            if (validaCamposVacios()) {
+                this.id = Integer.parseInt(jTAutores.getValueAt(fila, 0).toString());
+                String nombre = jTNombre.getText();
+                String apellido = jTApellido.getText();
+                String pais = jCBPais.getSelectedItem().toString();
+
+                Object[] objActualizar = new Object[4];
+                objActualizar[0] = nombre;
+                objActualizar[1] = apellido;
+                objActualizar[2] = pais;
+                objActualizar[3] = id;
+
+                autorBD.actualizar(objActualizar);
+                limpiarTabla();
+                limpiarCampos();
+                listarTabla();
+
+            } else {
+                mensajes.error("No cumple los requistos algun campo esta en vacio");
+            }
+
+        }
+
+    }
+
+    private void eliminar() {
+        String nombre = jTNombre.getText();
+        String apellido = jTApellido.getText();
+        int fila = jTAutores.getSelectedRow();
+        if (fila == -1) {
+            mensajes.error("Debe de Seleccionar una Fila");
+        } else {
+            boolean consulta = mensajes.confirmar("Desea continuar con la eliminacion del autor " + nombre + " " + apellido, "Seleccione una opcion");
+
+            if (consulta) {
+                this.id = Integer.parseInt(jTAutores.getValueAt(fila, 0).toString());
+                autorBD.eliminar(id);
+                limpiarTabla();
+                limpiarCampos();
+                listarTabla();
+            } else {
+                limpiarTabla();
+                limpiarCampos();
+                listarTabla();
+            }
+
+        }
+    }
+
+    private boolean validaCamposVacios() {
+        if (jTNombre.getText().length() == 0) {
+            return false;
+        } else if (jTApellido.getText().length() == 0) {
+            return false;
+        } else if (jCBPais.getSelectedIndex() == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBActualizar;
     private javax.swing.JButton jBAgregar;
-    private javax.swing.JButton jBBuscar;
     private javax.swing.JButton jBEliminar;
     private javax.swing.JButton jBLimpiar;
-    private javax.swing.JComboBox<String> jCBAutores;
+    private javax.swing.JComboBox<String> jCBPais;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;

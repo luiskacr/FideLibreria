@@ -5,18 +5,23 @@
  */
 package logica;
 
+import interfaces.Notificaciones;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author luis_
  */
 public class ClienteBD implements CRUD {
-
+    Notificaciones mensajes = new Notificaciones();
+    
     Connection con;
     Conexion cn = new Conexion();
     PreparedStatement ps;
@@ -41,7 +46,7 @@ public class ClienteBD implements CRUD {
                 c.setUsuario(rs.getString(7));
             }
         } catch (Exception e) {
-
+            mensajes.error("Error al buscar Dato " + e.getMessage());
         }
 
         return c;
@@ -67,10 +72,34 @@ public class ClienteBD implements CRUD {
                 c.setUsuario(rs.getString(7));
             }
         } catch (Exception e) {
-
+            mensajes.error("Error al listar Datos " + e.getMessage());
         }
 
         return c;
+    }
+
+    public boolean existeCliente(int ced) {
+        String sql = "SELECT idCliente FROM cliente WHERE cedCliente=?";
+        try {
+            con = cn.Conectar();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, ced);
+            rs = ps.executeQuery();
+
+        } catch (Exception e) {
+            mensajes.error("Error al buscar Dato " + e.getMessage());
+        }
+        try {
+            if (rs != null && rs.next()){ // if (rs != null) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ClienteBD.class.getName()).log(Level.SEVERE, null, ex);
+            return true;
+        }
+
     }
 
     @Override
@@ -93,6 +122,7 @@ public class ClienteBD implements CRUD {
                 listaCliente.add(c);
             }
         } catch (Exception e) {
+            mensajes.error("Error al listar Datos " + e.getMessage());
         }
 
         return listaCliente;
@@ -113,7 +143,7 @@ public class ClienteBD implements CRUD {
             ps.setObject(6, o[5]);
             r = ps.executeUpdate();
         } catch (Exception e) {
-            System.out.println("Error al incluir los Datos");
+            mensajes.error("Error al incluir los Datos " + e.getMessage());
         }
         return r;
     }
@@ -134,7 +164,7 @@ public class ClienteBD implements CRUD {
             ps.setObject(7, o[6]);
             r = ps.executeUpdate();
         } catch (Exception e) {
-            System.out.println("error query");
+            mensajes.error("Error al actualizar Dato " + e.getMessage());
         }
         return r;
     }
@@ -148,7 +178,7 @@ public class ClienteBD implements CRUD {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (Exception e) {
-
+            mensajes.error("Error al eliminar Dato " + e.getMessage());
         }
     }
 

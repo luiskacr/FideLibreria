@@ -5,8 +5,7 @@
  */
 package interfaces;
 
-import java.awt.Color;
-import java.awt.Dimension;
+
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import logica.Vendedor;
@@ -19,14 +18,32 @@ public class Principal extends javax.swing.JFrame {
 
     Vendedor vendedor = new Vendedor(); //Objeto vendedor que hace referencia al vendedor que se ingresa en el sistema.
     Notificaciones mensaje = new Notificaciones();
+
+    //Frames
+    public FrameClientes fc;
+    public FrameVentas vf;
+    public FrameLibros fl = new FrameLibros();
+    public FrameAutores au;
+    public FrameVendedores fv = new FrameVendedores();
+
     /**
      * Creates new form Principal
+     *
+     * @param vendedor
      */
     public Principal(Vendedor vendedor) {
         initComponents();
         this.setExtendedState(MAXIMIZED_BOTH);
         setIconImage(new ImageIcon(getClass().getResource("/imagenes/isotipo.png")).getImage());
         this.vendedor = vendedor;
+        if (vendedor.isPermisos() == false) {
+            jMReportes.setVisible(false);
+            jMConeccion.setVisible(false);
+            jMVendedores.setVisible(false);
+        }
+        vf = new FrameVentas(vendedor);
+        fc = new FrameClientes(vendedor);
+        au = new FrameAutores(vendedor);
     }
 
     public Principal() {
@@ -54,8 +71,9 @@ public class Principal extends javax.swing.JFrame {
         jMLibros = new javax.swing.JMenuItem();
         jMAutores = new javax.swing.JMenuItem();
         jMMante = new javax.swing.JMenu();
-        jMenuItem3 = new javax.swing.JMenuItem();
+        jMClientes = new javax.swing.JMenuItem();
         jMVendedores = new javax.swing.JMenuItem();
+        jMConeccion = new javax.swing.JMenuItem();
         jMReportes = new javax.swing.JMenu();
         jMRepVendedores = new javax.swing.JMenuItem();
 
@@ -135,11 +153,6 @@ public class Principal extends javax.swing.JFrame {
         jMVentas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/041-shopping.png"))); // NOI18N
         jMVentas.setText("Ventas");
         jMVentas.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jMVentas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMVentasActionPerformed(evt);
-            }
-        });
 
         jMGenerarVenta.setBackground(new java.awt.Color(61, 63, 64));
         jMGenerarVenta.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
@@ -159,11 +172,6 @@ public class Principal extends javax.swing.JFrame {
         jMInventario.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/008-checklist.png"))); // NOI18N
         jMInventario.setText("Inventario");
         jMInventario.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jMInventario.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMInventarioActionPerformed(evt);
-            }
-        });
 
         jMLibros.setBackground(new java.awt.Color(61, 63, 64));
         jMLibros.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
@@ -194,22 +202,38 @@ public class Principal extends javax.swing.JFrame {
         jMMante.setText("Mantenimiento");
         jMMante.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
 
-        jMenuItem3.setBackground(new java.awt.Color(61, 63, 64));
-        jMenuItem3.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jMenuItem3.setForeground(new java.awt.Color(255, 255, 255));
-        jMenuItem3.setText("Clientes");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+        jMClientes.setBackground(new java.awt.Color(61, 63, 64));
+        jMClientes.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jMClientes.setForeground(new java.awt.Color(255, 255, 255));
+        jMClientes.setText("Clientes");
+        jMClientes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
+                jMClientesActionPerformed(evt);
             }
         });
-        jMMante.add(jMenuItem3);
+        jMMante.add(jMClientes);
 
         jMVendedores.setBackground(new java.awt.Color(61, 63, 64));
         jMVendedores.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jMVendedores.setForeground(new java.awt.Color(255, 255, 255));
         jMVendedores.setText("Vendedores");
+        jMVendedores.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMVendedoresActionPerformed(evt);
+            }
+        });
         jMMante.add(jMVendedores);
+
+        jMConeccion.setBackground(new java.awt.Color(61, 63, 64));
+        jMConeccion.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jMConeccion.setForeground(new java.awt.Color(255, 255, 255));
+        jMConeccion.setText("Coneccion");
+        jMConeccion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMConeccionActionPerformed(evt);
+            }
+        });
+        jMMante.add(jMConeccion);
 
         jMenuBar1.add(jMMante);
 
@@ -246,26 +270,16 @@ public class Principal extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
-    private void jMVentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMVentasActionPerformed
-
-    }//GEN-LAST:event_jMVentasActionPerformed
-
     private void jMGenerarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMGenerarVentaActionPerformed
-        FrameVentas vf = new FrameVentas(vendedor);
+
         CentrarVenta(vf);
     }//GEN-LAST:event_jMGenerarVentaActionPerformed
 
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        FrameClientes fc = new FrameClientes();
+    private void jMClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMClientesActionPerformed
         CentrarVenta(fc);
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
-
-    private void jMInventarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMInventarioActionPerformed
-
-    }//GEN-LAST:event_jMInventarioActionPerformed
+    }//GEN-LAST:event_jMClientesActionPerformed
 
     private void jMLibrosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMLibrosActionPerformed
-        FrameLibros fl = new FrameLibros();
         CentrarVenta(fl);
     }//GEN-LAST:event_jMLibrosActionPerformed
 
@@ -276,32 +290,41 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMCambiaUsuarioActionPerformed
 
     private void jMAutoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMAutoresActionPerformed
-        FrameAutores au = new FrameAutores();
         CentrarVenta(au);
     }//GEN-LAST:event_jMAutoresActionPerformed
 
     private void jMAcercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMAcercaActionPerformed
         mensaje.notificar(
-            "Programa Creado por Luis Carlos Porras Castro"
-             +"\nPara la Materia Programación Cliente/Servidor Concurrente [I CM-G05-2021] "   
-        
-        
+                "Programa Creado por Luis Carlos Porras Castro"
+                + "\nPara la Materia Programación Cliente/Servidor Concurrente [I CM-G05-2021] "
         );
-        
     }//GEN-LAST:event_jMAcercaActionPerformed
 
-    public void CentrarVenta(JInternalFrame frame) {
-        VentanaPrincipal.add(frame);
-        if (frame.isVisible()) {
+    private void jMConeccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMConeccionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMConeccionActionPerformed
 
+    private void jMVendedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMVendedoresActionPerformed
+        if (vendedor.isPermisos()) {
+            CentrarVenta(fv);
+        } else {
+            mensaje.error("Usuario no tiene acceso");
+        }
+    }//GEN-LAST:event_jMVendedoresActionPerformed
+
+    public void CentrarVenta(JInternalFrame frame) {
+        if (frame.isVisible()) {
+            //Si el Frame esta abierto no hace nada
         } else {
             //revisar esa locacion 
             //Dimension dimension=VentanaPrincipal.getSize();
             //Dimension formulaio = frame.getSize();
             //frame.setLocation((dimension.width -formulaio.height)/2,(dimension.height-formulaio.width)/2);
-            frame.show();
-        }
 
+            VentanaPrincipal.add(frame);
+            frame.show();
+
+        }
     }
 
     /**
@@ -310,7 +333,6 @@ public class Principal extends javax.swing.JFrame {
     public static void main(String args[]) {
         try {
             Personalizar personalizar = new Personalizar();
-
             personalizar.table();
         } catch (Exception e) {
         }
@@ -328,6 +350,8 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMAcerca;
     private javax.swing.JMenuItem jMAutores;
     private javax.swing.JMenuItem jMCambiaUsuario;
+    private javax.swing.JMenuItem jMClientes;
+    private javax.swing.JMenuItem jMConeccion;
     private javax.swing.JMenuItem jMGenerarVenta;
     private javax.swing.JMenu jMInventario;
     private javax.swing.JMenuItem jMLibros;
@@ -340,6 +364,5 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
     // End of variables declaration//GEN-END:variables
 }

@@ -5,6 +5,7 @@
  */
 package logica;
 
+import interfaces.Notificaciones;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +17,8 @@ import java.util.List;
  * @author luis_
  */
 public class LibroBD implements CRUD {
-
+    Notificaciones mensajes = new Notificaciones();
+    
     PreparedStatement ps;
     ResultSet rs;
 
@@ -46,6 +48,7 @@ public class LibroBD implements CRUD {
             }
 
         } catch (Exception e) {
+            mensajes.error("Error al listar Datos " + e.getMessage());
         }
 
         return libro;
@@ -73,6 +76,7 @@ public class LibroBD implements CRUD {
 
             }
         } catch (Exception e) {
+            mensajes.error("Error al listar Datos " + e.getMessage());
         }
         return listaLibros;
     }
@@ -106,8 +110,8 @@ public class LibroBD implements CRUD {
             ps.setObject(6, o[5]);
             r= ps.executeUpdate();
         } catch (Exception e) {
-            System.out.println("Error al incluir el libro");
-            e.printStackTrace();
+            mensajes.error("Error al incluir Dato " + e.getMessage());
+
         }
         return r;
     }
@@ -128,8 +132,7 @@ public class LibroBD implements CRUD {
             ps.setObject(7, o[6]);
             r = ps.executeUpdate();
         } catch (Exception e) {
-            System.out.println("Error al actualizar el libro");
-            e.printStackTrace();
+            mensajes.error("Error al actualizar Dato " + e.getMessage());
         }
         return r;
     }
@@ -143,8 +146,7 @@ public class LibroBD implements CRUD {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (Exception e) {
-            System.out.println("Error al eliminar el libro");
-            e.printStackTrace();
+            mensajes.error("Error al eliminar Dato " + e.getMessage());
         }
     }
 }

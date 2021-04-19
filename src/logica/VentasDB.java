@@ -5,7 +5,7 @@
  */
 package logica;
 
-import com.mysql.cj.jdbc.PreparedStatementWrapper;
+import interfaces.Notificaciones;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +15,8 @@ import java.sql.ResultSet;
  * @author luis_
  */
 public class VentasDB {
-
+    Notificaciones mensajes = new Notificaciones();
+    
     Conexion cn = new Conexion();
     Connection con;
     PreparedStatement ps;
@@ -36,7 +37,7 @@ public class VentasDB {
             }
 
         } catch (Exception e) {
-            
+            mensajes.error("Error al buscar Dato " + e.getMessage());
         }
         return idv;
     }
@@ -54,9 +55,7 @@ public class VentasDB {
 
             respusta= ps.executeUpdate();
         } catch (Exception e) {
-            
-            System.out.println("Error al Guardar la venta");
-            e.printStackTrace();
+            mensajes.error("Error al almacenar Dato " + e.getMessage());
         }
         return respusta;
     }
@@ -73,9 +72,7 @@ public class VentasDB {
             
             respusta = ps.executeUpdate();
         } catch (Exception e) {
-            
-            System.out.println("Error al Guardar el detalle de venta");
-            e.printStackTrace();
+            mensajes.error("Error al almacenar Dato " + e.getMessage());
         }
         return respusta;
     }

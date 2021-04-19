@@ -5,6 +5,7 @@
  */
 package logica;
 
+import interfaces.Notificaciones;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,11 +17,15 @@ import java.util.List;
  * @author luis_
  */
 public class AutorBD implements CRUD {
+    
+    Notificaciones mensajes = new Notificaciones();
 
     Connection con;
     Conexion cn = new Conexion();
     PreparedStatement ps;
     ResultSet rs;
+
+    List<String> paices = new ArrayList<>();
 
     @Override
     public List listar() {
@@ -40,6 +45,7 @@ public class AutorBD implements CRUD {
             }
 
         } catch (Exception e) {
+            mensajes.error("Error al Listar Datos " + e.getMessage());
         }
 
         return listaAutores;
@@ -62,6 +68,7 @@ public class AutorBD implements CRUD {
             }
 
         } catch (Exception e) {
+            mensajes.error("Error al Listar Datos " + e.getMessage());
         }
 
         return NombreAutores;
@@ -83,8 +90,7 @@ public class AutorBD implements CRUD {
             }
 
         } catch (Exception e) {
-            System.out.println(e);
-            e.printStackTrace();
+            mensajes.error("Error al cargar los Datos " + e.getMessage());
             return "Error";
         }
         String autor = au.getNombreAutor() + " " + au.getApellidoAutor();
@@ -93,21 +99,56 @@ public class AutorBD implements CRUD {
 
     @Override
     public int incluir(Object[] o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int r=0;
+        String sql ="INSERT INTO autores(nombreAutor,apellidoAutor,pais) VALUES(?,?,?)";
+        try {
+            con = cn.Conectar();
+            ps = con.prepareStatement(sql);
+            ps.setObject(1, o[0]);
+            ps.setObject(2, o[1]);
+            ps.setObject(3, o[2]);
+            r = ps.executeUpdate();
+            
+        } catch (Exception e) {
+            mensajes.error("Error al Incluir Dato " + e.getMessage());
+        }
+        return r;
     }
 
     @Override
     public int actualizar(Object[] o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int r=0;
+        String sql ="UPDATE autores SET nombreAutor=?, apellidoAutor=?, pais=? WHERE idAutor=?";
+        try {
+            con = cn.Conectar();
+            ps = con.prepareStatement(sql);
+            ps.setObject(1, o[0]);
+            ps.setObject(2, o[1]);
+            ps.setObject(3, o[2]);
+            ps.setObject(4, o[3]);
+            r = ps.executeUpdate();
+
+        } catch (Exception e) {
+            mensajes.error("Error al actualizar Dato " + e.getMessage());
+        }
+        return r;
     }
+    
 
     @Override
     public void eliminar(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String sql = "DELETE FROM autores WHERE idAutor=?";
+        try {
+            con = cn.Conectar();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            mensajes.error("Error al eliminar Dato " + e.getMessage());
+        }
     }
 
     public List listaPaices() {
-        List<String> paices = new ArrayList<>();
         paices.add("");
         paices.add("ARG");
         paices.add("BRA");
@@ -121,5 +162,17 @@ public class AutorBD implements CRUD {
         paices.add("USA");
 
         return paices;
+    }
+
+    public int idPais(String nombre) {
+        int cont = 0;
+
+        for (int i = 0; i < paices.size(); i++) {
+
+            if (nombre.equalsIgnoreCase(paices.get(i))) {
+                cont = i;
+            }
+        }
+        return cont;
     }
 }

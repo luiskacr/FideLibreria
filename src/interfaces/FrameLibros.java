@@ -8,7 +8,10 @@ package interfaces;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JTable;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import logica.AutorBD;
 import logica.Libro;
 import logica.LibroBD;
@@ -31,6 +34,8 @@ public class FrameLibros extends javax.swing.JInternalFrame {
     Notificaciones mensaje = new Notificaciones();
     int id;
 
+    String filtro;
+
     /**
      * Creates new form Libros
      */
@@ -43,16 +48,17 @@ public class FrameLibros extends javax.swing.JInternalFrame {
         jTLibros.getTableHeader().getColumnModel().getColumn(7).setMaxWidth(0);
     }
 
-    public void llenarCombox() {
+    private void llenarCombox() {
         jCBAutores.removeAllItems();
         List<String> listaCB = new ArrayList<>();
+        jCBAutores.addItem("");
         listaCB = autorBD.ListarNombresAutores();
         for (int i = 0; i < listaCB.size(); i++) {
             jCBAutores.addItem(listaCB.get(i));
         }
     }
 
-    public void listar() {
+    private void listar() {
         List<Libro> lista = librosBD.listar();
         modelo = (DefaultTableModel) jTLibros.getModel();
         Object[] tabla = new Object[8];
@@ -68,142 +74,6 @@ public class FrameLibros extends javax.swing.JInternalFrame {
             modelo.addRow(tabla);
         }
         jTLibros.setModel(modelo);
-    }
-
-    public void incluir() {
-        try {
-            if (validaCamposVacios()) {
-
-                String nombre = jTNombre.getText();
-                int autor = jCBAutores.getSelectedIndex();
-                String editorial = jTEditorial.getText();
-                String genero = jTGenero.getText();
-                int stock = Integer.parseInt(jTStock.getText());
-                double precio = Double.parseDouble(jTPrecio.getText());
-
-                Object[] incluirLibro = new Object[6];
-                incluirLibro[0] = nombre;
-                incluirLibro[1] = autor;
-                incluirLibro[2] = editorial;
-                incluirLibro[3] = genero;
-                incluirLibro[4] = stock;
-                incluirLibro[5] = precio;
-
-                librosBD.incluir(incluirLibro);
-                
-                limpiartabla();
-                limpiarCampos();
-                listar();
-            } else {
-                mensaje.error("Algun campo se encuentra Vacio");
-            }
-
-        } catch (Exception e) {
-            mensaje.error("Error al incluir los Datos");
-        }
-
-    }
-
-    public void actualizar() {
-        int fila = jTLibros.getSelectedRow();
-        if (fila == -1) {
-            mensaje.error("No ha seleccionado una Fila");
-        } else if (validaNumeros()) {
-            String nombre = jTNombre.getText();
-            int autor = jCBAutores.getSelectedIndex();
-            String editorial = jTEditorial.getText();
-            String genero = jTGenero.getText();
-            int stock = Integer.parseInt(jTStock.getText());
-            double precio = Double.parseDouble(jTPrecio.getText());
-            int idlibro = id;
-
-            Object[] libroAct = new Object[7];
-            libroAct[0] = nombre;
-            libroAct[1] = autor;
-            libroAct[2] = editorial;
-            libroAct[3] = genero;
-            libroAct[4] = stock;
-            libroAct[5] = precio;
-            libroAct[6] = idlibro;
-
-            librosBD.actualizar(libroAct);
-            limpiartabla();
-            limpiarCampos();
-            listar();
-
-        } else {
-            mensaje.error("Los Datos son incorrectos,No cumplen con los requisitos para actualizarlos");
-        }
-
-    }
-
-    public boolean validaCamposVacios() {
-        if (jTNombre.getText().length() == 0) {
-            return false;
-        } else if (jCBAutores.getSelectedIndex() == 0) {
-            return false;
-        } else if (jTEditorial.getText().length() == 0) {
-            return false;
-        } else if (jTStock.getText().length() == 0) {
-            return false;
-        } else if (jTPrecio.getText().length() == 0) {
-            return false;
-        } else if (jTGenero.getText().length() == 0) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean validaNumeros() {
-        try {
-            Integer.parseInt(jTStock.getText());
-            Double.parseDouble(jTPrecio.getText());
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public void eliminar() {
-        int fila = jTLibros.getSelectedRow();
-        String nombreLibro = jTNombre.getText();
-        if (fila == -1) {
-            mensaje.error("No seleccionado un Libro para eliminar");
-        } else {
-            boolean consulta = mensaje.confirmar("Desea continuar con la eliminacion de " + nombreLibro, "Selccione una Opcion");
-            if (consulta) {
-
-                librosBD.eliminar(id);
-                limpiartabla();
-                limpiarCampos();
-                listar();
-            } else {
-                limpiartabla();
-                limpiarCampos();
-                listar();
-
-            }
-        }
-
-    }
-
-    public void limpiartabla() {
-
-        for (int i = 0; i < modelo.getRowCount(); i++) {
-            modelo.removeRow(i);
-            i = i - 1;
-        }
-    }
-
-    public void limpiarCampos() {
-        jTNombre.setText("");
-        jTEditorial.setText("");
-        jTStock.setText("");
-        jTPrecio.setText("");
-        jTGenero.setText("");
-        jCBAutores.setSelectedIndex(0);
-        llenarCombox();
-
     }
 
     /**
@@ -224,7 +94,6 @@ public class FrameLibros extends javax.swing.JInternalFrame {
         jLabel7 = new javax.swing.JLabel();
         jBLimpiar = new javax.swing.JButton();
         jBAgregar = new javax.swing.JButton();
-        jBBuscar = new javax.swing.JButton();
         jBActualizar = new javax.swing.JButton();
         jBEliminar = new javax.swing.JButton();
         jTNombre = new javax.swing.JTextField();
@@ -232,9 +101,9 @@ public class FrameLibros extends javax.swing.JInternalFrame {
         jTStock = new javax.swing.JTextField();
         jTPrecio = new javax.swing.JTextField();
         jTGenero = new javax.swing.JTextField();
-        jBCrear = new javax.swing.JButton();
         jCBAutores = new javax.swing.JComboBox<>();
-        jBBuscarAutor = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
+        jTBusqueda = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTLibros = new javax.swing.JTable();
@@ -295,18 +164,6 @@ public class FrameLibros extends javax.swing.JInternalFrame {
             }
         });
 
-        jBBuscar.setBackground(fondoPanel);
-        jBBuscar.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jBBuscar.setForeground(new java.awt.Color(255, 255, 255));
-        jBBuscar.setText("Buscar");
-        jBBuscar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jBBuscar.setFocusPainted(false);
-        jBBuscar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBBuscarActionPerformed(evt);
-            }
-        });
-
         jBActualizar.setBackground(fondoPanel);
         jBActualizar.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jBActualizar.setForeground(new java.awt.Color(255, 255, 255));
@@ -331,21 +188,19 @@ public class FrameLibros extends javax.swing.JInternalFrame {
             }
         });
 
-        jBCrear.setBackground(fondoPanel);
-        jBCrear.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jBCrear.setForeground(new java.awt.Color(255, 255, 255));
-        jBCrear.setText("Crear");
-        jBCrear.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-
         jCBAutores.setBackground(Texto);
         jCBAutores.setForeground(new java.awt.Color(255, 255, 255));
         jCBAutores.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jBBuscarAutor.setBackground(fondoPanel);
-        jBBuscarAutor.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jBBuscarAutor.setForeground(new java.awt.Color(255, 255, 255));
-        jBBuscarAutor.setText("Buscar");
-        jBBuscarAutor.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel8.setText("Buscar:");
+
+        jTBusqueda.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTBusquedaKeyReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -358,9 +213,7 @@ public class FrameLibros extends javax.swing.JInternalFrame {
                         .addComponent(jBLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jBAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jBBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addGap(186, 186, 186)
                         .addComponent(jBActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jBEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -381,16 +234,18 @@ public class FrameLibros extends javax.swing.JInternalFrame {
                                 .addComponent(jTPrecio, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTGenero)
-                            .addComponent(jCBAutores, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jBBuscarAutor, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 95, Short.MAX_VALUE)
-                                .addComponent(jBCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel3))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jTGenero)
+                                    .addComponent(jCBAutores, 0, 345, Short.MAX_VALUE)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel8)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTBusqueda)))))
                 .addContainerGap(31, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -406,19 +261,20 @@ public class FrameLibros extends javax.swing.JInternalFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(jTEditorial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jBCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jBBuscarAutor, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(22, 22, 22)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel5)
+                        .addComponent(jTGenero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(25, 25, 25)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(jLabel7)
                     .addComponent(jTStock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5)
-                    .addComponent(jTGenero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel8)
+                        .addComponent(jTBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(40, 40, 40)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -457,7 +313,6 @@ public class FrameLibros extends javax.swing.JInternalFrame {
         jTLibros.setGridColor(new java.awt.Color(204, 204, 204));
         jTLibros.setInheritsPopupMenu(true);
         jTLibros.setShowGrid(true);
-        jTLibros.setShowHorizontalLines(true);
         jTLibros.getTableHeader().setReorderingAllowed(false);
         jTLibros.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -520,18 +375,19 @@ public class FrameLibros extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpiarActionPerformed
-        limpiartabla();
-        listar();
-        limpiarCampos();
+        if (jTBusqueda.getText().length() == 0) {
+            limpiartabla();
+            listar();
+            limpiarCampos();
+            llenarCombox();
+        }else{
+            mensaje.error("Debe de limpiar el Campo de Busqueda");
+        }
     }//GEN-LAST:event_jBLimpiarActionPerformed
 
     private void jBAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBAgregarActionPerformed
         incluir();
     }//GEN-LAST:event_jBAgregarActionPerformed
-
-    private void jBBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBBuscarActionPerformed
-
-    }//GEN-LAST:event_jBBuscarActionPerformed
 
     private void jBActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBActualizarActionPerformed
         actualizar();
@@ -564,13 +420,163 @@ public class FrameLibros extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_jTLibrosMouseClicked
 
+    private void jTBusquedaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTBusquedaKeyReleased
+        buscar(jTBusqueda.getText(), jTLibros);
+
+    }//GEN-LAST:event_jTBusquedaKeyReleased
+
+    private void incluir() {
+
+        if (validaCamposVacios()) {
+            if (validaNumeros()) {
+                String nombre = jTNombre.getText();
+                int autor = jCBAutores.getSelectedIndex();
+                String editorial = jTEditorial.getText();
+                String genero = jTGenero.getText();
+                int stock = Integer.parseInt(jTStock.getText());
+                double precio = Double.parseDouble(jTPrecio.getText());
+
+                Object[] incluirLibro = new Object[6];
+                incluirLibro[0] = nombre;
+                incluirLibro[1] = autor;
+                incluirLibro[2] = editorial;
+                incluirLibro[3] = genero;
+                incluirLibro[4] = stock;
+                incluirLibro[5] = precio;
+
+                librosBD.incluir(incluirLibro);
+
+                limpiartabla();
+                limpiarCampos();
+                listar();
+            } else {
+                mensaje.error("Los Campos de Stock o Precio no son numeros");
+            }
+        } else {
+            mensaje.error("Algun campo se encuentra Vacio");
+        }
+
+    }
+
+    private void actualizar() {
+        int fila = jTLibros.getSelectedRow();
+        if (fila == -1) {
+            mensaje.error("No ha seleccionado una Fila");
+        } else if (validaCamposVacios()) {
+            if (validaNumeros()) {
+                String nombre = jTNombre.getText();
+                int autor = jCBAutores.getSelectedIndex();
+                String editorial = jTEditorial.getText();
+                String genero = jTGenero.getText();
+                int stock = Integer.parseInt(jTStock.getText());
+                double precio = Double.parseDouble(jTPrecio.getText());
+                int idlibro = id;
+
+                Object[] libroAct = new Object[7];
+                libroAct[0] = nombre;
+                libroAct[1] = autor;
+                libroAct[2] = editorial;
+                libroAct[3] = genero;
+                libroAct[4] = stock;
+                libroAct[5] = precio;
+                libroAct[6] = idlibro;
+
+                librosBD.actualizar(libroAct);
+                limpiartabla();
+                limpiarCampos();
+                listar();
+            } else {
+                mensaje.error("Los Campos de Stock o Precio no son numeros");
+            }
+        } else {
+            mensaje.error("Algun campo se encuentra Vacio");
+        }
+
+    }
+
+    private void eliminar() {
+        int fila = jTLibros.getSelectedRow();
+        String nombreLibro = jTNombre.getText();
+        if (fila == -1) {
+            mensaje.error("No seleccionado un Libro para eliminar");
+        } else {
+            boolean consulta = mensaje.confirmar("Desea continuar con la eliminacion de " + nombreLibro, "Selccione una Opcion");
+            if (consulta) {
+
+                librosBD.eliminar(id);
+                limpiartabla();
+                limpiarCampos();
+                listar();
+            } else {
+                limpiartabla();
+                limpiarCampos();
+                listar();
+
+            }
+        }
+
+    }
+
+    private void buscar(String consulta, JTable jtableBuscar) {
+        DefaultTableModel busqueda = new DefaultTableModel();
+
+        modelo = (DefaultTableModel) jtableBuscar.getModel();
+        TableRowSorter<DefaultTableModel> tr = new TableRowSorter<>(modelo);
+        jtableBuscar.setRowSorter(tr);
+        tr.setRowFilter(RowFilter.regexFilter(consulta));
+
+    }
+
+    private boolean validaCamposVacios() {
+        if (jTNombre.getText().length() == 0) {
+            return false;
+        } else if (jCBAutores.getSelectedIndex() == 0) {
+            return false;
+        } else if (jTEditorial.getText().length() == 0) {
+            return false;
+        } else if (jTStock.getText().length() == 0) {
+            return false;
+        } else if (jTPrecio.getText().length() == 0) {
+            return false;
+        } else if (jTGenero.getText().length() == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validaNumeros() {
+        try {
+            Integer.parseInt(jTStock.getText());
+            Double.parseDouble(jTPrecio.getText());
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void limpiartabla() {
+
+        for (int i = 0; i < modelo.getRowCount(); i++) {
+            modelo.removeRow(i);
+            i = i - 1;
+        }
+    }
+
+    private void limpiarCampos() {
+        jTNombre.setText("");
+        jTEditorial.setText("");
+        jTStock.setText("");
+        jTPrecio.setText("");
+        jTGenero.setText("");
+        jCBAutores.setSelectedIndex(0);
+        llenarCombox();
+
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBActualizar;
     private javax.swing.JButton jBAgregar;
-    private javax.swing.JButton jBBuscar;
-    private javax.swing.JButton jBBuscarAutor;
-    private javax.swing.JButton jBCrear;
     private javax.swing.JButton jBEliminar;
     private javax.swing.JButton jBLimpiar;
     private javax.swing.JComboBox<String> jCBAutores;
@@ -580,9 +586,11 @@ public class FrameLibros extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextField jTBusqueda;
     private javax.swing.JTextField jTEditorial;
     private javax.swing.JTextField jTGenero;
     private javax.swing.JTable jTLibros;
