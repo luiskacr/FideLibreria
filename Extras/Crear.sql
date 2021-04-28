@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS vendedor(
     nombreVendedor VARCHAR(70) NOT NULL,
     apellidoVendedor VARCHAR(70) NOT NULL,
     estado TINYINT(1) NOT NULL,
+    permisos TINYINT(1) NOT NULL,
     usuario  VARCHAR(70) NOT NULL,
     contrasena VARCHAR(70) NOT NULL,
     PRIMARY KEY (idVendedor)
