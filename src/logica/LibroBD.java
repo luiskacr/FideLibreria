@@ -17,8 +17,9 @@ import java.util.List;
  * @author luis_
  */
 public class LibroBD implements CRUD {
+
     Notificaciones mensajes = new Notificaciones();
-    
+
     PreparedStatement ps;
     ResultSet rs;
 
@@ -27,6 +28,36 @@ public class LibroBD implements CRUD {
 
     Conexion con = new Conexion();
     Connection acceso;
+
+    public List inventario() {
+        List<Object[]> inventario = new ArrayList<>();
+        String sql = "select libros.idLibro,libros.nombreLibro,autores.nombreAutor,autores.apellidoAutor,libros.editorial,\n"
+                + "libros.genero,autores.pais,libros.stock,libros.precio \n"
+                + "from libros\n"
+                + "inner join autores on libros.autor = autores.idAutor;";
+        try {
+            acceso = con.Conectar();
+            ps = acceso.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Object[] rp = new Object[9];
+                rp[0] = rs.getString(1);
+                rp[1] = rs.getString(2);
+                rp[2] = rs.getString(3);
+                rp[3] = rs.getString(4);
+                rp[4] = rs.getString(5);
+                rp[5] = rs.getString(6);
+                rp[6] = rs.getString(7);
+                rp[7] = rs.getString(8);
+                rp[8] = rs.getString(9);
+
+                inventario.add(rp);
+            }
+        } catch (Exception e) {
+            mensajes.error("Error al cargar las Ventas " + e.getMessage());
+        }
+        return inventario;
+    }
 
     public Libro listarID(int idLibro) {
         String sql = "SELECT * FROM libros WHERE idLibro=?";
@@ -97,8 +128,8 @@ public class LibroBD implements CRUD {
 
     @Override
     public int incluir(Object[] o) {
-        int r=0;
-        String sql="INSERT INTO libros(nombreLibro,autor,editorial,genero,stock,precio) VALUES(?,?,?,?,?,?)";
+        int r = 0;
+        String sql = "INSERT INTO libros(nombreLibro,autor,editorial,genero,stock,precio) VALUES(?,?,?,?,?,?)";
         try {
             acceso = con.Conectar();
             ps = acceso.prepareStatement(sql);
@@ -108,7 +139,7 @@ public class LibroBD implements CRUD {
             ps.setObject(4, o[3]);
             ps.setObject(5, o[4]);
             ps.setObject(6, o[5]);
-            r= ps.executeUpdate();
+            r = ps.executeUpdate();
         } catch (Exception e) {
             mensajes.error("Error al incluir Dato " + e.getMessage());
 

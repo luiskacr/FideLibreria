@@ -17,7 +17,7 @@ import java.util.List;
  * @author luis_
  */
 public class AutorBD implements CRUD {
-    
+
     Notificaciones mensajes = new Notificaciones();
 
     Connection con;
@@ -26,30 +26,6 @@ public class AutorBD implements CRUD {
     ResultSet rs;
 
     List<String> paices = new ArrayList<>();
-
-    @Override
-    public List listar() {
-        ArrayList<Autores> listaAutores = new ArrayList<>();
-        String sql = "SELECT * FROM autores";
-        try {
-            con = cn.Conectar();
-            ps = con.prepareStatement(sql);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                Autores au = new Autores();
-                au.setIdAutor(rs.getInt(1));
-                au.setNombreAutor(rs.getString(2));
-                au.setApellidoAutor(rs.getString(3));
-                au.setPais(rs.getString(4));
-                listaAutores.add(au);
-            }
-
-        } catch (Exception e) {
-            mensajes.error("Error al Listar Datos " + e.getMessage());
-        }
-
-        return listaAutores;
-    }
 
     public List ListarNombresAutores() {
         List<String> NombreAutores = new ArrayList<>();
@@ -98,9 +74,33 @@ public class AutorBD implements CRUD {
     }
 
     @Override
+    public List listar() {
+        ArrayList<Autores> listaAutores = new ArrayList<>();
+        String sql = "SELECT * FROM autores";
+        try {
+            con = cn.Conectar();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Autores au = new Autores();
+                au.setIdAutor(rs.getInt(1));
+                au.setNombreAutor(rs.getString(2));
+                au.setApellidoAutor(rs.getString(3));
+                au.setPais(rs.getString(4));
+                listaAutores.add(au);
+            }
+
+        } catch (Exception e) {
+            mensajes.error("Error al Listar Datos " + e.getMessage());
+        }
+
+        return listaAutores;
+    }
+
+    @Override
     public int incluir(Object[] o) {
-        int r=0;
-        String sql ="INSERT INTO autores(nombreAutor,apellidoAutor,pais) VALUES(?,?,?)";
+        int r = 0;
+        String sql = "INSERT INTO autores(nombreAutor,apellidoAutor,pais) VALUES(?,?,?)";
         try {
             con = cn.Conectar();
             ps = con.prepareStatement(sql);
@@ -108,7 +108,7 @@ public class AutorBD implements CRUD {
             ps.setObject(2, o[1]);
             ps.setObject(3, o[2]);
             r = ps.executeUpdate();
-            
+
         } catch (Exception e) {
             mensajes.error("Error al Incluir Dato " + e.getMessage());
         }
@@ -117,8 +117,8 @@ public class AutorBD implements CRUD {
 
     @Override
     public int actualizar(Object[] o) {
-        int r=0;
-        String sql ="UPDATE autores SET nombreAutor=?, apellidoAutor=?, pais=? WHERE idAutor=?";
+        int r = 0;
+        String sql = "UPDATE autores SET nombreAutor=?, apellidoAutor=?, pais=? WHERE idAutor=?";
         try {
             con = cn.Conectar();
             ps = con.prepareStatement(sql);
@@ -133,7 +133,6 @@ public class AutorBD implements CRUD {
         }
         return r;
     }
-    
 
     @Override
     public void eliminar(int id) {

@@ -24,7 +24,6 @@ public class Servidor {
 
     public static void main(String[] args) throws InterruptedException {
         graficos graficos = new graficos();
-
     }
 }
 
@@ -65,10 +64,10 @@ class graficos extends JFrame implements Runnable {
         setResizable(false);
         setLocationRelativeTo(null);
         setTitle("Consola: Servidor de Correos Automaticos");
-
-        inicio();
-
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        inicio();
 
         Thread hilo = new Thread(this);
         hilo.start();
@@ -81,10 +80,9 @@ class graficos extends JFrame implements Runnable {
         DataInputStream in;
         DataOutputStream out;
         final int puerto = 9000;
-        areaTexto.append("Servidor en Estado:Activo");
-
-        areaTexto.append("\nEn espera del cliente:");
         try {
+            areaTexto.append("Servidor en Estado:Activo");
+            areaTexto.append("\nEn espera del cliente:");
             servidor = new ServerSocket(puerto);
 
             while (true) {
@@ -103,7 +101,8 @@ class graficos extends JFrame implements Runnable {
             }
 
         } catch (Exception e) {
-            areaErrores.append("\n" + tiempo.FechaExacta() + " Error en Coneccion con el cliente  " + e.getMessage() );
+            areaErrores.append("\n" + tiempo.FechaExacta() + " Error en Coneccion con el cliente  " + e.getMessage());
+            areaTexto.append("Error al Iniciar Servicio");
         }
 
     }
@@ -147,14 +146,14 @@ class graficos extends JFrame implements Runnable {
             //Se imprime el correo.
             System.out.println("De:Fidelibros@correo.com"
                     + "\nPara: " + correo
-                    + "\nAsunto Creacion de Usuario y Contraseña Temporal"
+                    + "\nAsunto Creación de Usuario y Contraseña Temporal"
                     + "\n"
                     + "\nEstimado Cliente: " + nombre + " " + apellido
-                    + "\nLe informamos que Genero el usuario:" + usuario + " con la Contraseña:" + pass
-                    + "\nLe Agradecemos ingresar a http://fidelibro.com/acceso antes de 24 Horas, Caso contrario expirara la Contraseña"
+                    + "\nLe informamos que Genero el usuario: " + usuario + " con la Contraseña: " + pass
+                    + "\nLe Agradecemos ingresar a http://fidelibro.com/acceso antes de 24 Horas, Caso contrario expirará la Contraseña"
             );
 
-            areaTexto.append("\n" + tiempo.FechaExacta() + " Se enviar Correo a " + correo + " Cliente: " + nombre + " " + apellido);
+            areaTexto.append("\n" + tiempo.FechaExacta() + " Se envia Correo a " + correo + " Cliente: " + nombre + " " + apellido);
 
         } catch (Exception e) {
             areaErrores.append("\n" + tiempo.FechaExacta() + " Error al enviar Correo  " + e.getMessage());
@@ -168,16 +167,15 @@ class graficos extends JFrame implements Runnable {
         PreparedStatement ps;
         ResultSet rs;
         int r = 0;
-
         try {
             String sql = "UPDATE cliente set contrasena=? WHERE cedCliente=?";
-
             con = cn.Conectar();
             ps = con.prepareStatement(sql);
             ps.setString(1, pass);
             ps.setInt(2, ced);
 
             r = ps.executeUpdate();
+             areaTexto.append("\nSe Almance nueva Contraseña en Base de Datos");
         } catch (Exception e) {
             areaErrores.append("\n" + tiempo.FechaExacta() + " Error al Conectar con la Base de Datos  " + e.getMessage());
         }
@@ -189,7 +187,6 @@ class graficos extends JFrame implements Runnable {
         final String mayusculas = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         final String minisculas = "abcdefghijklmnopqrstuvwxyz";
         try {
-
             for (int i = 0; i < 8; i++) {
                 int cod = (int) (Math.random() * 3);
                 if (cod == 1) {

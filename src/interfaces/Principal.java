@@ -5,7 +5,6 @@
  */
 package interfaces;
 
-
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import logica.Vendedor;
@@ -22,9 +21,12 @@ public class Principal extends javax.swing.JFrame {
     //Frames
     public FrameClientes fc;
     public FrameVentas vf;
-    public FrameLibros fl = new FrameLibros();
+    public FrameLibros fl;
     public FrameAutores au;
     public FrameVendedores fv = new FrameVendedores();
+    public FrameRepVendedores frp;
+    public FrameRepVentas frv;
+    public FrameRepInventario fri;
 
     /**
      * Creates new form Principal
@@ -38,12 +40,15 @@ public class Principal extends javax.swing.JFrame {
         this.vendedor = vendedor;
         if (vendedor.isPermisos() == false) {
             jMReportes.setVisible(false);
-            jMConeccion.setVisible(false);
             jMVendedores.setVisible(false);
         }
         vf = new FrameVentas(vendedor);
         fc = new FrameClientes(vendedor);
         au = new FrameAutores(vendedor);
+        fl = new FrameLibros(vendedor);
+        frp = new FrameRepVendedores();
+        frv = new FrameRepVentas();
+        fri = new FrameRepInventario();
     }
 
     public Principal() {
@@ -61,7 +66,6 @@ public class Principal extends javax.swing.JFrame {
         VentanaPrincipal = new javax.swing.JDesktopPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMMenu = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
         jMCambiaUsuario = new javax.swing.JMenuItem();
         jMAcerca = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -73,9 +77,10 @@ public class Principal extends javax.swing.JFrame {
         jMMante = new javax.swing.JMenu();
         jMClientes = new javax.swing.JMenuItem();
         jMVendedores = new javax.swing.JMenuItem();
-        jMConeccion = new javax.swing.JMenuItem();
         jMReportes = new javax.swing.JMenu();
         jMRepVendedores = new javax.swing.JMenuItem();
+        jMRepVentas = new javax.swing.JMenuItem();
+        jMRepVentas1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Punto de Venta Fidelibros V1");
@@ -104,19 +109,13 @@ public class Principal extends javax.swing.JFrame {
         jMMenu.setBackground(new java.awt.Color(61, 63, 64));
         jMMenu.setForeground(new java.awt.Color(255, 255, 255));
         jMMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/049-website.png"))); // NOI18N
-        jMMenu.setText("Menu");
+        jMMenu.setText("Menú");
         jMMenu.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-
-        jMenuItem1.setBackground(new java.awt.Color(61, 63, 64));
-        jMenuItem1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jMenuItem1.setForeground(new java.awt.Color(255, 255, 255));
-        jMenuItem1.setText("Ayuda");
-        jMMenu.add(jMenuItem1);
 
         jMCambiaUsuario.setBackground(new java.awt.Color(61, 63, 64));
         jMCambiaUsuario.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jMCambiaUsuario.setForeground(new java.awt.Color(255, 255, 255));
-        jMCambiaUsuario.setText("Cerrar Seccion");
+        jMCambiaUsuario.setText("Cerrar Sesión ");
         jMCambiaUsuario.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMCambiaUsuarioActionPerformed(evt);
@@ -157,7 +156,7 @@ public class Principal extends javax.swing.JFrame {
         jMGenerarVenta.setBackground(new java.awt.Color(61, 63, 64));
         jMGenerarVenta.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jMGenerarVenta.setForeground(new java.awt.Color(255, 255, 255));
-        jMGenerarVenta.setText("Generar Venta");
+        jMGenerarVenta.setText("Generar Ventas");
         jMGenerarVenta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMGenerarVentaActionPerformed(evt);
@@ -224,17 +223,6 @@ public class Principal extends javax.swing.JFrame {
         });
         jMMante.add(jMVendedores);
 
-        jMConeccion.setBackground(new java.awt.Color(61, 63, 64));
-        jMConeccion.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jMConeccion.setForeground(new java.awt.Color(255, 255, 255));
-        jMConeccion.setText("Coneccion");
-        jMConeccion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMConeccionActionPerformed(evt);
-            }
-        });
-        jMMante.add(jMConeccion);
-
         jMenuBar1.add(jMMante);
 
         jMReportes.setForeground(new java.awt.Color(255, 255, 255));
@@ -246,7 +234,34 @@ public class Principal extends javax.swing.JFrame {
         jMRepVendedores.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jMRepVendedores.setForeground(new java.awt.Color(255, 255, 255));
         jMRepVendedores.setText("Reporte Vendedores");
+        jMRepVendedores.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMRepVendedoresActionPerformed(evt);
+            }
+        });
         jMReportes.add(jMRepVendedores);
+
+        jMRepVentas.setBackground(new java.awt.Color(61, 63, 64));
+        jMRepVentas.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jMRepVentas.setForeground(new java.awt.Color(255, 255, 255));
+        jMRepVentas.setText("Reporte Ventas");
+        jMRepVentas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMRepVentasActionPerformed(evt);
+            }
+        });
+        jMReportes.add(jMRepVentas);
+
+        jMRepVentas1.setBackground(new java.awt.Color(61, 63, 64));
+        jMRepVentas1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jMRepVentas1.setForeground(new java.awt.Color(255, 255, 255));
+        jMRepVentas1.setText("Reporte Inventario");
+        jMRepVentas1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMRepVentas1ActionPerformed(evt);
+            }
+        });
+        jMReportes.add(jMRepVentas1);
 
         jMenuBar1.add(jMReportes);
 
@@ -266,10 +281,6 @@ public class Principal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        System.exit(0);
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
-
     private void jMGenerarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMGenerarVentaActionPerformed
 
         CentrarVenta(vf);
@@ -283,26 +294,9 @@ public class Principal extends javax.swing.JFrame {
         CentrarVenta(fl);
     }//GEN-LAST:event_jMLibrosActionPerformed
 
-    private void jMCambiaUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMCambiaUsuarioActionPerformed
-        Login login = new Login();
-        login.setVisible(true);
-        dispose();
-    }//GEN-LAST:event_jMCambiaUsuarioActionPerformed
-
     private void jMAutoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMAutoresActionPerformed
         CentrarVenta(au);
     }//GEN-LAST:event_jMAutoresActionPerformed
-
-    private void jMAcercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMAcercaActionPerformed
-        mensaje.notificar(
-                "Programa Creado por Luis Carlos Porras Castro"
-                + "\nPara la Materia Programación Cliente/Servidor Concurrente [I CM-G05-2021] "
-        );
-    }//GEN-LAST:event_jMAcercaActionPerformed
-
-    private void jMConeccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMConeccionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMConeccionActionPerformed
 
     private void jMVendedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMVendedoresActionPerformed
         if (vendedor.isPermisos()) {
@@ -311,6 +305,47 @@ public class Principal extends javax.swing.JFrame {
             mensaje.error("Usuario no tiene acceso");
         }
     }//GEN-LAST:event_jMVendedoresActionPerformed
+
+    private void jMRepVendedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMRepVendedoresActionPerformed
+        if (vendedor.isPermisos()) {
+            CentrarVenta(frp);
+        } else {
+            mensaje.error("Usuario no tiene acceso");
+        }
+    }//GEN-LAST:event_jMRepVendedoresActionPerformed
+
+    private void jMRepVentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMRepVentasActionPerformed
+        if (vendedor.isPermisos()) {
+            CentrarVenta(frv);
+        } else {
+            mensaje.error("Usuario no tiene acceso");
+        }
+    }//GEN-LAST:event_jMRepVentasActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMAcercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMAcercaActionPerformed
+        mensaje.notificar(
+            "Programa Creado por Luis Carlos Porras Castro"
+            + "\nPara la Materia Programación Cliente/Servidor Concurrente [I CM-G05-2021] "
+        );
+    }//GEN-LAST:event_jMAcercaActionPerformed
+
+    private void jMCambiaUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMCambiaUsuarioActionPerformed
+        Login login = new Login();
+        login.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_jMCambiaUsuarioActionPerformed
+
+    private void jMRepVentas1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMRepVentas1ActionPerformed
+         if (vendedor.isPermisos()) {
+            CentrarVenta(fri);
+        } else {
+            mensaje.error("Usuario no tiene acceso");
+        }
+    }//GEN-LAST:event_jMRepVentas1ActionPerformed
 
     public void CentrarVenta(JInternalFrame frame) {
         if (frame.isVisible()) {
@@ -351,18 +386,18 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMAutores;
     private javax.swing.JMenuItem jMCambiaUsuario;
     private javax.swing.JMenuItem jMClientes;
-    private javax.swing.JMenuItem jMConeccion;
     private javax.swing.JMenuItem jMGenerarVenta;
     private javax.swing.JMenu jMInventario;
     private javax.swing.JMenuItem jMLibros;
     private javax.swing.JMenu jMMante;
     private javax.swing.JMenu jMMenu;
     private javax.swing.JMenuItem jMRepVendedores;
+    private javax.swing.JMenuItem jMRepVentas;
+    private javax.swing.JMenuItem jMRepVentas1;
     private javax.swing.JMenu jMReportes;
     private javax.swing.JMenuItem jMVendedores;
     private javax.swing.JMenu jMVentas;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     // End of variables declaration//GEN-END:variables
 }

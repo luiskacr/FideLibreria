@@ -27,13 +27,14 @@ public class FrameClientes extends javax.swing.JInternalFrame {
     Color fondoPanel = new Color(69, 73, 74); //Gris Medio
     Color Texto = new Color(102, 102, 102); //Gris Claro
 
+    Personalizar personalizar = new Personalizar();
+    Notificaciones mensaje = new Notificaciones();
     ClienteBD CDatos = new ClienteBD();
     Cliente cliente = new Cliente();
-    Notificaciones mensaje = new Notificaciones();
     Vendedor vendedor = new Vendedor();
 
     DefaultTableModel modelo = new DefaultTableModel();
-    Personalizar personalizar = new Personalizar();
+
     int id;
 
     /**
@@ -63,6 +64,22 @@ public class FrameClientes extends javax.swing.JInternalFrame {
             modelo.addRow(tabla);
         }
         jTableCliente.setModel(modelo);
+    }
+
+    private void limpiarCapos() {
+        jTCedula.setText("");
+        jTNombre.setText("");
+        jTApellido.setText("");
+        jTCorreo.setText("");
+        jTUsuario.setText("");
+        jTDireccion.setText("");
+    }
+
+    private void limpiarTabla() {
+        for (int i = 0; i < modelo.getRowCount(); i++) {
+            modelo.removeRow(i);
+            i--;
+        }
     }
 
     /**
@@ -113,7 +130,7 @@ public class FrameClientes extends javax.swing.JInternalFrame {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Cedula");
+        jLabel1.setText("Cédula");
 
         jTCedula.setBackground(Texto);
         jTCedula.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
@@ -158,7 +175,7 @@ public class FrameClientes extends javax.swing.JInternalFrame {
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel6.setText("Direccion:");
+        jLabel6.setText("Dirección:");
 
         jTDireccion.setBackground(Texto);
         jTDireccion.setColumns(20);
@@ -380,7 +397,9 @@ public class FrameClientes extends javax.swing.JInternalFrame {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -401,7 +420,7 @@ public class FrameClientes extends javax.swing.JInternalFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(22, 22, 22)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pack();
@@ -505,7 +524,6 @@ public class FrameClientes extends javax.swing.JInternalFrame {
 
     private void buscar(int cedBuscar) {
         cliente = CDatos.buscarCliente(cedBuscar);
-        System.out.println(cliente.getId());
         if (cliente.getId() <= 0) {
             mensaje.error("El cliente " + cedBuscar + " no existe, Favor Crearlo");
         } else {
@@ -564,7 +582,7 @@ public class FrameClientes extends javax.swing.JInternalFrame {
                 listar();
                 limpiarCapos();
             } else {
-               mensaje.error("La Cedula del cliente ya existe en el sistema"); 
+                mensaje.error("La Cedula del cliente ya existe en el sistema");
                 buscar(Integer.parseInt(jTCedula.getText()));
             }
 
@@ -650,22 +668,6 @@ public class FrameClientes extends javax.swing.JInternalFrame {
             return true;
         }
 
-    }
-
-    private void limpiarCapos() {
-        jTCedula.setText("");
-        jTNombre.setText("");
-        jTApellido.setText("");
-        jTCorreo.setText("");
-        jTUsuario.setText("");
-        jTDireccion.setText("");
-    }
-
-    private void limpiarTabla() {
-        for (int i = 0; i < modelo.getRowCount(); i++) {
-            modelo.removeRow(i);
-            i--;
-        }
     }
 
 

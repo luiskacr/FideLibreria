@@ -42,6 +42,8 @@ public class CrearFactura {
      * @param Total  Total con los impuestos de la Compra 
      */
     public void CrearPDF(ArrayList Productos, String NumFacura, String Cliente, String Correo, String Vendedor, String SubTotal, String Total) {
+        
+       
         Document factura = new Document();
 
         try {
@@ -56,12 +58,12 @@ public class CrearFactura {
             cabecera.scaleToFit(600, 1200);
             cabecera.setAlignment(Chunk.ALIGN_CENTER);
 
-            //Parrafo Arriba del PDF
+            //Parrafos del archivo 
             Paragraph parrafo1 = new Paragraph();
             parrafo1.setAlignment(parrafo1.ALIGN_CENTER);
             parrafo1.setFont(FontFactory.getFont("Tahoma", 20, Font.BOLD, BaseColor.BLACK));
             parrafo1.add("\n");
-            parrafo1.add("Numero :" + NumFacura + "\n\n");
+            parrafo1.add("Número: " + NumFacura + "\n\n");
 
             Paragraph parrafo2 = new Paragraph();
             parrafo2.setAlignment(parrafo1.ALIGN_LEFT);
@@ -82,16 +84,16 @@ public class CrearFactura {
             parrafo4.setFont(FontFactory.getFont("Tahoma", 20, Font.BOLD, BaseColor.DARK_GRAY));
             parrafo4.add("\nSubTotal: ₡" + SubTotal + "          ");
             parrafo4.add("\n");
-            parrafo4.add("\nTotal: ₡" + Total + "           ");
+            parrafo4.add("\nTotal + IVA: ₡" + Total + "           ");
             //parrafo4.add("\n\n\n");
 
             Paragraph parrafo5 = new Paragraph();
             parrafo5.setAlignment(parrafo1.ALIGN_CENTER);
             parrafo5.setFont(FontFactory.getFont("Tahoma", 10, Font.NORMAL, BaseColor.BLACK));
             parrafo5.add("\n\n");
-            parrafo5.add("\nFactura Genereada Automaticamente por el Sistema de Punto de Venta");
-            parrafo5.add("\nSegun lo esblecido por la Direccion General de Tributacion");
-            parrafo5.add("\nVersion del Documento: 1.0 ");
+            parrafo5.add("\nFactura Generada Automáticamente por el Sistema de Punto de Venta");
+            parrafo5.add("\nSegún lo esblecido por la Dirección General de Tributación");
+            parrafo5.add("\nVersión del Documento: 1.0 ");
             parrafo5.add("\nSi Hay un problema con el Documento enviar un correo a: facturaelectronica@fidelibros.com");
 
             //Linea Separatoria 
@@ -131,8 +133,8 @@ public class CrearFactura {
 
             mensaje.notificar("Se Crea Factura " + NumFacura);
         } catch (Exception e) {
-            e.printStackTrace();
-            mensaje.error("Error al Crear la Factura Electronica");
+            
+            mensaje.error("Error al Crear la Factura Electronica " + e.getMessage());
 
         }
 

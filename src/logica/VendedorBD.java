@@ -69,6 +69,31 @@ public class VendedorBD implements CRUD {
 
         return vendedor;
     }
+    
+    public List listarNombresVendedores(){
+      List<String> Vendedores= new ArrayList<>();
+        String sql = "SELECT * from vendedor";
+        try {
+            acceso = con.Conectar();
+            ps = acceso.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Vendedor vn = new Vendedor();
+                vn.setIdVendedor(rs.getInt(1));
+                vn.setCedVendedor(rs.getInt(2));
+                vn.setNombreVendedor(rs.getString(3));
+                vn.setApellidoVendedor(rs.getString(4));
+               
+                Vendedores.add(vn.getIdVendedor() +": "+ vn.getNombreVendedor() + " " + vn.getApellidoVendedor());
+            }
+
+        } catch (Exception e) {
+            mensajes.error("Error al Listar Datos " + e.getMessage());
+        }
+
+        return Vendedores;
+    
+    }
 
     @Override
     public List listar() {

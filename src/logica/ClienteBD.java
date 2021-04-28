@@ -20,8 +20,9 @@ import java.util.logging.Logger;
  * @author luis_
  */
 public class ClienteBD implements CRUD {
+
     Notificaciones mensajes = new Notificaciones();
-    
+
     Connection con;
     Conexion cn = new Conexion();
     PreparedStatement ps;
@@ -36,14 +37,8 @@ public class ClienteBD implements CRUD {
             ps.setInt(1, cedCliente);
             rs = ps.executeQuery();
             while (rs.next()) {
-
                 c.setId(rs.getInt(1));
-                c.setCedCliente(rs.getInt(2));
-                c.setNombreCliente(rs.getString(3));
-                c.setApellidoCliente(rs.getString(4));
-                c.setCorreoCliente(rs.getString(5));
-                c.setDireccionCliente(rs.getString(6));
-                c.setUsuario(rs.getString(7));
+
             }
         } catch (Exception e) {
             mensajes.error("Error al buscar Dato " + e.getMessage());
@@ -90,7 +85,7 @@ public class ClienteBD implements CRUD {
             mensajes.error("Error al buscar Dato " + e.getMessage());
         }
         try {
-            if (rs != null && rs.next()){ // if (rs != null) {
+            if (rs != null && rs.next()) { // if (rs != null) {
                 return false;
             } else {
                 return true;

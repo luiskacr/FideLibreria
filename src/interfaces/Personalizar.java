@@ -110,9 +110,4 @@ public class Personalizar {
     }
 
 
-    public void tableLineas(int datos) {
-        
-    }
-
-
 }

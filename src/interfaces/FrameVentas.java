@@ -44,6 +44,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
     double impPagar;
     double total;
     final double impuesto = 0.13;
+    int item = 0;
 
     public FrameVentas(Vendedor vendedor) {
 
@@ -287,7 +288,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setText("Cod. Cliente:");
+        jLabel4.setText("Ced. Cliente:");
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
@@ -498,7 +499,6 @@ public class FrameVentas extends javax.swing.JInternalFrame {
         if (jTVentas.getColumnModel().getColumnCount() > 0) {
             jTVentas.getColumnModel().getColumn(0).setResizable(false);
             jTVentas.getColumnModel().getColumn(0).setPreferredWidth(5);
-            jTVentas.getColumnModel().getColumn(1).setResizable(false);
             jTVentas.getColumnModel().getColumn(1).setPreferredWidth(5);
             jTVentas.getColumnModel().getColumn(2).setResizable(false);
             jTVentas.getColumnModel().getColumn(2).setPreferredWidth(200);
@@ -589,8 +589,9 @@ public class FrameVentas extends javax.swing.JInternalFrame {
                 
             }
             limpiarCampos();
+            
         }
-
+        
     }
     
     public void actualizaStock() {
@@ -673,11 +674,11 @@ public class FrameVentas extends javax.swing.JInternalFrame {
     }
 
     public void agregar() {
-        int item = 0;
+        
         double total;
 
         modelo = (DefaultTableModel) jTVentas.getModel();
-        item = item + 1;
+        this.item +=1;
         int idp = libro.getIdLibro();
         String nombLibro = jTProducto.getText();
         precioLibro = Double.parseDouble(jTPrecio.getText());
@@ -770,7 +771,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
             } else {
                 respuesta = mensaje.confirmar("Codigo de Producto incorrecto, Desea Buscarlo?", "Error con el Codigo");
                 if (respuesta) {
-                    FrameLibros lb = new FrameLibros();
+                    FrameLibros lb = new FrameLibros(vendedor);
                     Principal.VentanaPrincipal.add(lb);
                     lb.setVisible(true);
                 }
@@ -794,6 +795,7 @@ public class FrameVentas extends javax.swing.JInternalFrame {
         jTVendedor.setText(vendedor.getNombreVendedor() + " " + vendedor.getApellidoVendedor());
         generaSerieFactura();
         limpiartabla();
+        this.item = 0;
     }
 
     public void limpiarAgregar() {
